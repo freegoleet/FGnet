@@ -173,12 +173,15 @@ void AFGPlayer::OnPickup(AFGPickup* Pickup)
 
 void AFGPlayer::Client_OnPickupRockets_Implementation(int32 PickedUpRockets)
 {
+	/*NumRockets = PickedUpRockets;
+	BP_OnNumRocketsChanged(PickedUpRockets);*/
 }
 
 void AFGPlayer::Server_OnPickup_Implementation(AFGPickup* Pickup)
 {
 	
 	ServerNumRockets += Pickup->NumRockets;
+	//Client_OnPickupRockets(ServerNumRockets);
 	Multicast_OnPickupRockets(ServerNumRockets);
 }
 
@@ -196,19 +199,24 @@ void AFGPlayer::OnDamageTaken(int32 DamageToTake)
 
 void AFGPlayer::Client_OnDamageTaken_Implementation(int32 CorrectedPlayerHealth)
 {
+	//PlayerHealth = CorrectedPlayerHealth;
+	//BP_OnPlayerHealthChanged(PlayerHealth);
 }
 
 void AFGPlayer::Server_OnDamageTaken_Implementation(int32 DamageToTake)
 {
 	ServerPlayerHealth -= DamageToTake;
 
+	//Client_OnDamageTaken(ServerPlayerHealth);
 	Multicast_OnDamageTaken(ServerPlayerHealth);
 }
 
 void AFGPlayer::Multicast_OnDamageTaken_Implementation(int32 ServersPlayerHealth)
 {
+	//if (!IsLocallyControlled()) {
 		PlayerHealth = ServersPlayerHealth;
 		BP_OnPlayerHealthChanged(PlayerHealth);
+	//}
 }
 
 void AFGPlayer::ShowDebugMenu()
