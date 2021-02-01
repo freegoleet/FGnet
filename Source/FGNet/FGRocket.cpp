@@ -94,6 +94,12 @@ void AFGRocket::Explode()
 	MakeFree();
 }
 
+void AFGRocket::Collide(FHitResult other)
+{
+	if (AFGPlayer* player = Cast<AFGPlayer>(other.Actor))
+		player->OnDamageTaken(DamageValue);
+}
+
 void AFGRocket::MakeFree()
 {
 	bIsFree = true;
@@ -101,14 +107,6 @@ void AFGRocket::MakeFree()
 	SetRocketVisibility(false);
 }
 
-void AFGRocket::Collide(FHitResult other)
-{
-
-	if (AFGPlayer* player = Cast<AFGPlayer>(other.Actor))
-		player->OnDamageTaken(DamageValue);
-		
-		//other.GetActor()->IsA<AFGPlayer>()
-}
 
 void AFGRocket::SetRocketVisibility(bool bVisible)
 {

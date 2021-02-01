@@ -23,6 +23,7 @@ public:
 	bool IsFree() const { return bIsFree; }
 
 	void Explode();
+	void Collide(FHitResult other);
 	void MakeFree();
 
 	UPROPERTY(EditAnywhere, Category = Damage)
@@ -30,7 +31,6 @@ public:
 
 	AFGPlayer* RocketOwner;
 
-	void Collide(FHitResult other);
 private:
 	void SetRocketVisibility(bool bVisible);
 

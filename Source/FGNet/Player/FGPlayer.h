@@ -50,7 +50,7 @@ public:
 	UFUNCTION(Client, Reliable)
 	void Client_OnPickupRockets(int32 PickedUpRockets);
 
-	UFUNCTION(NetMulticast, Unreliable)
+	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_OnPickupRockets(int32 PickedUpRockets);
 
 	//Transform
@@ -99,10 +99,11 @@ public:
 private:
 	void AddMovementVelocity(float DeltaTime);
 
+	//Health
 	int32 ServerPlayerHealth = 0;
 
 	UPROPERTY(Replicated)
-	int32 PlayerHealth = 100;
+	int32 PlayerHealth = 0;
 
 	//Rockets
 	int32 ServerNumRockets = 0;

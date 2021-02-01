@@ -27,4 +27,8 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Fire", meta = (ClampMin = 0.0))
 	float FireCooldown = 0.15f;
+
+	UPROPERTY(EditAnywhere, Category = "Health", meta = (ClampMin = 1))
+	int32 StartingHealth = 100;
+
 };

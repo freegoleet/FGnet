@@ -17,14 +17,17 @@
 
 const static float MaxMoveDeltaTime = 0.125f;
 
-AFGPlayer::AFGPlayer() {
+AFGPlayer::AFGPlayer() 
+{
 	PrimaryActorTick.bCanEverTick = true;
 
 	CollisionComponent = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionComponent"));
+	CollisionComponent->SetCollisionProfileName(TEXT("Pawn"));
 	RootComponent = CollisionComponent;
 
 	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
 	StaticMeshComponent->SetupAttachment(CollisionComponent);
+	StaticMeshComponent->SetCollisionProfileName(TEXT("NoCollision"));
 
 	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComponent"));
 	SpringArmComponent->bInheritYaw = false;
@@ -38,7 +41,8 @@ AFGPlayer::AFGPlayer() {
 	SetReplicateMovement(false);
 }
 
-void AFGPlayer::BeginPlay() {
+void AFGPlayer::BeginPlay() 
+{
 	Super::BeginPlay();
 
 	MovementComponent->SetUpdatedComponent(CollisionComponent);
@@ -51,8 +55,7 @@ void AFGPlayer::BeginPlay() {
 
 	SpawnRockets();
 
-	PlayerHealth = 100;
-	ServerPlayerHealth = 100;
+	ServerPlayerHealth = PlayerSettings->StartingHealth;
 
 	BP_OnNumRocketsChanged(NumRockets);
 	BP_OnPlayerHealthChanged(ServerPlayerHealth);
@@ -177,15 +180,14 @@ void AFGPlayer::Client_OnPickupRockets_Implementation(int32 PickedUpRockets)
 
 void AFGPlayer::Server_OnPickup_Implementation(AFGPickup* Pickup)
 {
-	
 	ServerNumRockets += Pickup->NumRockets;
-	Multicast_OnPickupRockets(ServerNumRockets);
+	Multicast_OnPickupRockets(Pickup->NumRockets);
 }
 
 void AFGPlayer::Multicast_OnPickupRockets_Implementation(int32 PickedUpRockets)
 {
-		NumRockets = PickedUpRockets;
-		BP_OnNumRocketsChanged(NumRockets);
+	NumRockets += PickedUpRockets;
+	BP_OnNumRocketsChanged(NumRockets);
 }
 
 void AFGPlayer::OnDamageTaken(int32 DamageToTake)
@@ -201,14 +203,13 @@ void AFGPlayer::Client_OnDamageTaken_Implementation(int32 CorrectedPlayerHealth)
 void AFGPlayer::Server_OnDamageTaken_Implementation(int32 DamageToTake)
 {
 	ServerPlayerHealth -= DamageToTake;
-
 	Multicast_OnDamageTaken(ServerPlayerHealth);
 }
 
 void AFGPlayer::Multicast_OnDamageTaken_Implementation(int32 ServersPlayerHealth)
 {
-		PlayerHealth = ServersPlayerHealth;
-		BP_OnPlayerHealthChanged(PlayerHealth);
+	PlayerHealth = ServersPlayerHealth;
+	BP_OnPlayerHealthChanged(PlayerHealth);
 }
 
 void AFGPlayer::ShowDebugMenu()
@@ -436,7 +437,6 @@ void AFGPlayer::Multicast_SendMovement_Implementation(const FVector& InClientLoc
 			}
 		}
 	}
-
 }
 
 FVector AFGPlayer::GetRocketStartLocation() const
@@ -453,5 +453,5 @@ void AFGPlayer::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifet
 	DOREPLIFETIME(AFGPlayer, ReplicatedLocation);
 	DOREPLIFETIME(AFGPlayer, RocketInstances);
 	DOREPLIFETIME(AFGPlayer, PlayerHealth);
-	DOREPLIFETIME(AFGPlayer, NumRockets);
+	//DOREPLIFETIME(AFGPlayer, NumRockets);
 }
